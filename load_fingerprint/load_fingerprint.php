@@ -16,36 +16,33 @@ Class LoadFingerprint extends \GCore\Admin\Extensions\Chronoforms\Action{
 	function execute(&$form, $action_id){
 		$config =  $form->actions_config[$action_id];
 		$config = new \GCore\Libs\Parameter($config);
-
 		$doc = \GCore\Libs\Document::getInstance();
 
-		$field_fp = \GCore\Helpers\Html::input('fp', array('type' => 'hidden', 'value' => ''));
+		if (!isset($_COOKIE['formUserHash'])) {
+			$doc->addJsFile(\GCore\C::ext_url('chronoforms', 'admin').'actions/load_fingerprint/js/fingerprint2.min.js');
+			$doc->addJsFile(\GCore\C::ext_url('chronoforms', 'admin').'actions/load_fingerprint/js/jquery.cookie.js');
+			$doc->addJsCode('
+			jQuery(document).ready(function($){
 
-		$doc->addJsFile(\GCore\C::ext_url('chronoforms', 'admin').'actions/load_fingerprint/js/fingerprint2.min.js');
-		$doc->addJsFile(\GCore\C::ext_url('chronoforms', 'admin').'actions/load_fingerprint/js/jquery.cookie.js');
-		$doc->addJsCode('
-		jQuery(document).ready(function($){
+				var fp_options = {
+					excludeWebGL: true,
+					excludeSessionStorage: true,
+					excludeFlashFonts: true,
+					excludeJsFonts: true
+				};
 
-			var fp_options = {
-				excludeWebGL: true,
-				excludeSessionStorage: true,
-				excludeFlashFonts: true,
-				excludeJsFonts: true
-			};
+				var cookie_options = {
+					expires: 1
+				};
 
-			var cookie_options = {
-				expires: 1
-			};
-			new Fingerprint2(fp_options).get(function(hash){
-				if ($.cookie("formUserHash") != hash)
-					$.cookie("formUserHash", hash, cookie_options);
+				if (typeof $.cookie("formUserHash") == "undefined") {
+					new Fingerprint2(fp_options).get(function(hash){
+						return $.cookie("formUserHash", hash, cookie_options);
+					});
+				}
+			});');
+		}
 
-				$("#chronoform-'.$form->form['Form']['title'].'").append(\''.$field_fp.'\');
-				$("input#fp").val($.cookie("formUserHash"));
-			});
-
-		});
-		');
 	}
 
 	public static function config(){

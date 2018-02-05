@@ -21,12 +21,9 @@ Class CheckFingerprint extends \GCore\Admin\Extensions\Chronoforms\Action{
 	function execute(&$form, $action_id){
 		$config =  $form->actions_config[$action_id];
 		$config = new \GCore\Libs\Parameter($config);
+		$bit = 32; // hash size md5
 
-		if (
-			isset($_COOKIE['formUserHash']) &&
-			isset($form->data['fp']) &&
-			$form->data['fp'] == $_COOKIE['formUserHash']
-		)
+		if (isset($_COOKIE['formUserHash']) && strlen($_COOKIE['formUserHash']) == $bit)
 		{
 			$this->events['success'] = 1;
 			$form->debug[$action_id][self::$title][] = "Fingerprint check passed.";
