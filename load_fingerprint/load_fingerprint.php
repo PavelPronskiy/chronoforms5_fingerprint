@@ -35,11 +35,10 @@ Class LoadFingerprint extends \GCore\Admin\Extensions\Chronoforms\Action{
 					expires: 1
 				};
 
-				if (typeof $.cookie("formUserHash") == "undefined") {
-					new Fingerprint2(fp_options).get(function(hash){
-						return $.cookie("formUserHash", hash, cookie_options);
-					});
-				}
+				new Fingerprint2(fp_options).get(function(hash){
+					return $.cookie("formUserHash", hash, cookie_options);
+				});
+				
 			});');
 		}
 
